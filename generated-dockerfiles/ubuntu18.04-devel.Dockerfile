@@ -7,15 +7,15 @@
 #
 # Copyright (c) 2020, NVIDIA CORPORATION.
 
-ARG CUDA_VERSION=10.0
+ARG CUDA_VERSION=10.2
 ARG CUDA_MAJORMINOR_VERSION=${CUDA_VERSION}
 ARG LINUX_VERSION=ubuntu18.04
 ARG PYTHON_VERSION=3.6
 
-FROM gpuci/miniconda-cuda-rapidsenv:${CUDA_VERSION}-devel-${LINUX_VERSION}-py${PYTHON_VERSION}
+FROM develimage
 
-ARG CC_VERSION=7
-ARG CXX_VERSION=7
+# ARG CC_VERSION=7
+# ARG CXX_VERSION=7
 ARG PARALLEL_LEVEL=16
 ARG RAPIDS_CONDA_VERSION_SPEC=0.14*
 
@@ -26,14 +26,15 @@ ENV RAPIDS_DIR=/rapids
 
 ENV LD_LIBRARY_PATH=/opt/conda/envs/rapids/lib:${LD_LIBRARY_PATH}
 
-ENV CC=/usr/bin/gcc-${CC_VERSION}
-ENV CXX=/usr/bin/g++-${CXX_VERSION}
-ENV CUDAHOSTCXX=/usr/bin/g++-${CXX_VERSION}
+# ENV CC=/usr/bin/gcc-${CC_VERSION}
+# ENV CXX=/usr/bin/g++-${CXX_VERSION}
+# ENV CUDAHOSTCXX=/usr/bin/g++-${CXX_VERSION}
 ENV PATH=${PATH}:/conda/bin
 RUN apt-get update && apt-get install -y \
     gsfonts \
     && rm -rf /var/lib/apt/lists/*
 
+RUN ccache -s
 
 RUN mkdir -p ${RAPIDS_DIR}/utils 
 COPY start_jupyter.sh condaretry nbtest.sh nbtestlog2junitxml.py ${RAPIDS_DIR}/utils/
