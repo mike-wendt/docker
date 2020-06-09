@@ -12,11 +12,11 @@ ARG CUDA_MAJORMINOR_VERSION=${CUDA_VERSION}
 ARG LINUX_VERSION=ubuntu18.04
 ARG PYTHON_VERSION=3.6
 
-FROM develimage
+FROM develimagenocache
 
 # ARG CC_VERSION=7
 # ARG CXX_VERSION=7
-ARG PARALLEL_LEVEL=16
+ARG PARALLEL_LEVEL=32
 ARG RAPIDS_CONDA_VERSION_SPEC=0.14*
 
 ARG CUDA_MAJORMINOR_VERSION
@@ -34,7 +34,6 @@ RUN apt-get update && apt-get install -y \
     gsfonts \
     && rm -rf /var/lib/apt/lists/*
 
-RUN ccache -s
 
 RUN mkdir -p ${RAPIDS_DIR}/utils 
 COPY start_jupyter.sh condaretry nbtest.sh nbtestlog2junitxml.py ${RAPIDS_DIR}/utils/
@@ -59,8 +58,9 @@ RUN source activate rapids \
   && conda list --show-channel-urls
 RUN ${RAPIDS_DIR}/utils/condaretry install -y -n rapids --freeze-installed \
     rapids-notebook-env=${RAPIDS_CONDA_VERSION_SPEC} \
-  && conda clean -afy \
-  && chmod -R ugo+w /opt/conda
+  && conda clean -afy
+  # \
+  # && chmod -R ugo+w /opt/conda
 
 RUN source activate rapids \
   && pip install "git+https://github.com/rapidsai/jupyterlab-nvdashboard.git@master#egg=jupyterlab-nvdashboard" --upgrade \
@@ -70,8 +70,9 @@ RUN cd ${RAPIDS_DIR} \
   && source activate rapids \
   && git clone -b branch-0.14 --depth 1 --single-branch https://github.com/rapidsai/notebooks.git \
   && cd notebooks \
-  && git submodule update --init --remote --recursive --no-single-branch --depth 1 \
-  && chmod -R ugo+w /opt/conda ${RAPIDS_DIR}
+  && git submodule update --init --remote --recursive --no-single-branch --depth 1
+  # \
+  # && chmod -R ugo+w /opt/conda ${RAPIDS_DIR}
 
 COPY test.sh test-nbcontrib.sh /
 
@@ -182,9 +183,10 @@ RUN cd ${RAPIDS_DIR}/dask-cuda && \
   source activate rapids && \
   python setup.py install
 
+RUN ccache -s
 
-RUN chmod -R ugo+w /opt/conda ${RAPIDS_DIR}
-
+# RUN chmod -R ugo+w /opt/conda ${RAPIDS_DIR}
+# chmod -R ugo+w /
 COPY .run_in_rapids.sh /.run_in_rapids
 ENTRYPOINT [ "/usr/bin/tini", "--", "/.run_in_rapids" ]
 
