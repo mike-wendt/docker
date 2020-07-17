@@ -201,12 +201,10 @@ RUN cd ${RAPIDS_DIR}/dask-cuda && \
 
 RUN ccache -s \
   && ccache -c \
-  && chmod -R ugo+w /ccache \
   && ccache -s
 
 
-RUN conda clean -afy \
-  && chmod -R ugo+w /opt/conda ${RAPIDS_DIR}
+
 ENTRYPOINT [ "/usr/bin/tini", "--", "/.run_in_rapids" ]
 
 CMD [ "/bin/bash" ]
