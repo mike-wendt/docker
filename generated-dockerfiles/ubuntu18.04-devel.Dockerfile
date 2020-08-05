@@ -15,8 +15,8 @@ ARG FROM_IMAGE=gpuci/rapidsai
 
 FROM ${FROM_IMAGE}:${RAPIDS_VER}-cuda${CUDA_VER}-devel-${LINUX_VER}-py${PYTHON_VER}
 
-RUN conda config --add channels gpuci
-RUN conda install -c rapidsai rapids-scout-local
+RUN conda config --add channels gpuci \
+ && conda install -c rapidsai rapids-scout-local
 
 COPY ccache /ccache
 RUN ccache -s
