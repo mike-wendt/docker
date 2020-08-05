@@ -15,7 +15,7 @@ ARG FROM_IMAGE=gpuci/rapidsai
 
 FROM ${FROM_IMAGE}:${RAPIDS_VER}-cuda${CUDA_VER}-devel-${LINUX_VER}-py${PYTHON_VER}
 
-conda install -c rapidsai rapids-scout-local
+RUN conda install -c rapidsai rapids-scout-local
 
 COPY ccache /ccache
 RUN ccache -s
